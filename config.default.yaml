@@ -1,0 +1,7 @@
+OAuthSetup:
+    Facebook:
+        ClientID: YOUR_FB_APP_CLIENT_ID
+        ClientSecret: YOUR_FB_APP_CLIENT_SECRET
+        RedirectURL: /oauth/facebook/callback
+        DoneURL: /oauth/facebook/profile
+        CookieNameAccessToken: "oaFBAccessToken"
