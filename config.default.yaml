@@ -3,5 +3,16 @@ OAuthSetup:
         ClientID: YOUR_FB_APP_CLIENT_ID
         ClientSecret: YOUR_FB_APP_CLIENT_SECRET
         RedirectURL: /oauth/facebook/callback
+        Scopes:
         DoneURL: /oauth/facebook/profile
         CookieNameAccessToken: "oaFBAccessToken"
+    Google:
+        ClientID: YOUR_GOOGLE_PROJECT_CLIENT_ID
+        ClientSecret: YOUR_GOOGLE_PROJECT_CLIENT_SECRET
+        RedirectURL: /oauth/google/callback
+        Scopes:
+            - openid
+            - https://www.googleapis.com/auth/userinfo.email
+            - https://www.googleapis.com/auth/userinfo.profile
+        DoneURL: /oauth/google/profile
+        CookieNameAccessToken: "oaGoogleAccessToken"

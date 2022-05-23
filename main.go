@@ -8,7 +8,7 @@ import (
     "github.com/gin-gonic/gin"
     "golang.org/x/oauth2"
     "golang.org/x/oauth2/facebook"
-    //"golang.org/x/oauth2/google"
+    "golang.org/x/oauth2/google"
 )
 
 //
@@ -18,6 +18,7 @@ type YAML_OAuthClientSetup struct {
     ClientID string                 `yaml:"ClientID"`
     ClientSecret string             `yaml:"ClientSecret"`
     RedirectURL string              `yaml:"RedirectURL"`
+    Scopes []string                 `yaml:"Scopes"`
     DoneURL string                  `yaml:"DoneURL"`
     CookieNameAccessToken string    `yaml:"CookieNameAccessToken"`
 }
@@ -33,6 +34,7 @@ func main() {
         if err := yaml.Unmarshal(yfile, &mainConfig) ; err != nil {
             log.Fatalln(err)
         }
+        log.Println(mainConfig)
     }
 
     r := gin.Default()
@@ -75,11 +77,26 @@ func main() {
             }
         }
 
-        if _, isSetup := mainConfig.OAuthSetup["Google"]; isSetup {
+        if oauthClientInfo, isSetup := mainConfig.OAuthSetup["Google"]; isSetup {
+            // https://pkg.go.dev/golang.org/x/oauth2/google
+            oauthGoogleSetup(
+                &oauth2.Config{
+                    ClientID: oauthClientInfo.ClientID,
+                    ClientSecret: oauthClientInfo.ClientSecret,
+                    RedirectURL: oauthClientInfo.RedirectURL,
+                    Scopes: oauthClientInfo.Scopes,
+                    Endpoint: google.Endpoint,
+                },
+                // finishOAuthPage
+                oauthClientInfo.DoneURL,
+                // AccessTokenCookieName
+                oauthClientInfo.CookieNameAccessToken,
+            )
             oauthGoogle := oauthEndPoint.Group("google")
             {
-                oauthGoogle.GET("/", nil)
-                oauthGoogle.GET("/callback", nil)
+                oauthGoogle.GET("/", oauthGoogleProfileHandler)
+                oauthGoogle.GET("/profile", oauthGoogleRequiredAccessTokenMiddleware(), oauthGoogleProfileHandler)
+                oauthGoogle.GET("/callback", oauthGoogleCallbackHandler)
             }
         }
     }
